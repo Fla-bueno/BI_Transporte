@@ -22,7 +22,7 @@ const SYSTEM = [
   'Não invente valores, causas confirmadas ou nomes de clientes.',
   'Quando levantar causas possíveis, deixe claro que são hipóteses a validar.',
   'Formato: texto simples, sem markdown (sem asteriscos, sem #). Use parágrafos curtos ou linhas começando com hífen.',
-  'Limite de aproximadamente 180 palavras.',
+  'Limite de aproximadamente 350 palavras. Priorize respostas completas, sem interromper análises ou recomendações no meio.',
 ].join(' ');
 
 export default async (req) => {
@@ -41,8 +41,8 @@ export default async (req) => {
     return json({ error: 'JSON inválido' }, 400);
   }
 
-  const prompt = String(body.prompt || '').slice(0, 1000);
-  const context = String(body.context || '').slice(0, 4000);
+  const prompt = String(body.prompt || '').slice(0, 2000);
+  const context = String(body.context || '').slice(0, 12000);
   if (!prompt) return json({ error: 'prompt vazio' }, 400);
 
   const apiKey = Netlify.env.get('ANTHROPIC_API_KEY');
@@ -58,7 +58,7 @@ export default async (req) => {
       },
       body: JSON.stringify({
         model: Netlify.env.get('CLAUDE_MODEL') || 'claude-sonnet-5-5',
-        max_tokens: 700,
+        max_tokens: 1500,
         system: SYSTEM + '\n\nDADOS DO RELATÓRIO:\n' + context,
         messages: [{ role: 'user', content: prompt }],
       }),
